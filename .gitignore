@@ -1,0 +1,57 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+packages/
+
+# ASP.NET Core
+appsettings.Development.json
+
+# Entity Framework
+*.dbmdl
+
+# Publish
+publish/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JetBrains
+*.DotSettings.user
+
+# Node.js
+node_modules/
+
+# Coverage
+coverage/
+TestResults/
+
+# Secrets
+secrets.json
+
+# Generated files
+wwwroot/lib/
+
+# Temporary files
+*.tmp
+*.temp
