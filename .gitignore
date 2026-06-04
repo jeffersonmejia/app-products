@@ -48,6 +48,8 @@ TestResults/
 
 # Secrets
 secrets.json
+.env
+secrets/*.txt
 
 # Generated files
 wwwroot/lib/

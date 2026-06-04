@@ -52,18 +52,37 @@ namespace CrudProductos.Controllers
                 .OrderBy(p => p.Nombre)     
                 .ToListAsync());
         }*/
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            string descripcion = "RAM";
-            string nombre = "pizarra";
+            const int pageSize = 5;
+            page = Math.Max(page, 1);
 
+            var query = _context.Productos
+                .AsNoTracking()
+                .OrderBy(p => p.Id);
 
-            return View(await _context.Productos
-                .Where(p => EF.Functions.ILike(p.Descripcion, $"%{descripcion}%") || EF.Functions.ILike(p.Nombre, $"%{nombre}%")) 
-                .Where(p => p.Stock > 0)
-                .OrderByDescending(p => p.Nombre)
-                .Take(5)
-                .ToListAsync());
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+            }
+
+            var productos = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var pagedResult = new PagedResult<Producto>
+            {
+                Items = productos,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+
+            return View(pagedResult);
         }
         // GET: Productos/Details/5
         public async Task<IActionResult> Details(int? id)
