@@ -20,10 +20,10 @@ namespace CrudProductos.Models
         [Range(0, 10000, ErrorMessage = "El stock no puede ser negativo")]
         public int Stock { get; set; }
 
+        public int? CategoriaId { get; set; }
+
+        public Categoria? Categoria { get; set; }
+
         public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
-        
-
-
-        
     }
 }

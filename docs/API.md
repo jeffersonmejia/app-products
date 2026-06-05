@@ -92,6 +92,7 @@ This project exposes server-rendered MVC routes instead of a JSON REST API. Each
    - `Descripcion`: required string, maximum length 250.
    - `Precio`: decimal value from `0.01` to `9999.99`.
    - `Stock`: integer value from `0` to `10000`.
+   - `CategoriaId`: optional foreign key to `Categoria`.
    - `FechaRegistro`: UTC registration date.
 
 2. `Categoria`

@@ -11,8 +11,8 @@ namespace CrudProductos.Data
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             await context.Database.MigrateAsync();
-            await SeedProductosAsync(context);
             await SeedCategoriasAsync(context);
+            await SeedProductosAsync(context);
         }
 
         private static async Task SeedProductosAsync(AppDbContext context)
@@ -61,6 +61,19 @@ namespace CrudProductos.Data
                 new() { Nombre = "Soporte para laptop ajustable", Descripcion = "Base ergonomica para laptop", Precio = 24.00m, Stock = 19 }
             };
 
+            var categoriasPorNombre = await context.Categorias
+                .ToDictionaryAsync(c => c.Nombre, c => c.Id);
+
+            foreach (var producto in productos)
+            {
+                var categoriaNombre = ObtenerCategoriaNombre(producto.Nombre, producto.Descripcion);
+
+                if (categoriasPorNombre.TryGetValue(categoriaNombre, out var categoriaId))
+                {
+                    producto.CategoriaId = categoriaId;
+                }
+            }
+
             var nombresExistentes = await context.Productos
                 .Select(p => p.Nombre)
                 .ToListAsync();
@@ -76,6 +89,53 @@ namespace CrudProductos.Data
 
             context.Productos.AddRange(productosFaltantes);
             await context.SaveChangesAsync();
+        }
+
+        private static string ObtenerCategoriaNombre(string nombre, string descripcion)
+        {
+            var texto = $"{nombre} {descripcion}".ToLowerInvariant();
+
+            if (texto.Contains("laptop") || texto.Contains("macbook") || texto.Contains("tablet"))
+            {
+                return "Computadoras";
+            }
+
+            if (texto.Contains("monitor") || texto.Contains("proyector"))
+            {
+                return "Monitores";
+            }
+
+            if (texto.Contains("teclado") || texto.Contains("mouse") || texto.Contains("webcam")
+                || texto.Contains("microfono") || texto.Contains("audifonos") || texto.Contains("parlantes")
+                || texto.Contains("adaptador") || texto.Contains("hub") || texto.Contains("cargador")
+                || texto.Contains("soporte"))
+            {
+                return "Perifericos";
+            }
+
+            if (texto.Contains("ssd") || texto.Contains("nvme") || texto.Contains("pendrive")
+                || texto.Contains("externo") || texto.Contains("ram"))
+            {
+                return "Almacenamiento";
+            }
+
+            if (texto.Contains("router") || texto.Contains("switch") || texto.Contains("red")
+                || texto.Contains("cat6"))
+            {
+                return "Redes";
+            }
+
+            if (texto.Contains("impresora"))
+            {
+                return "Impresion";
+            }
+
+            if (texto.Contains("licencia") || texto.Contains("antivirus") || texto.Contains("microsoft"))
+            {
+                return "Software";
+            }
+
+            return "Mobiliario";
         }
 
         private static async Task SeedCategoriasAsync(AppDbContext context)

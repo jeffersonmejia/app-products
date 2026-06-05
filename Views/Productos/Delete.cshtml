@@ -36,6 +36,12 @@
             @Html.DisplayFor(model => model.Stock)
         </dd>
         <dt class = "col-sm-2">
+            Categoria
+        </dt>
+        <dd class = "col-sm-10">
+            @(Model.Categoria?.Nombre ?? "Sin categoria")
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.FechaRegistro)
         </dt>
         <dd class = "col-sm-10">

@@ -49,6 +49,7 @@ The database contains two main tables: `Productos` for product CRUD operations a
 erDiagram
     PRODUCTOS {
         int Id PK
+        int CategoriaId FK
         string Nombre
         string Descripcion
         decimal Precio
@@ -64,9 +65,11 @@ erDiagram
         bool Activa
         datetime FechaCreacion
     }
+
+    CATEGORIAS ||--o{ PRODUCTOS : contains
 ```
 
-The `Categorias` table includes a primary key through `Id`, a decimal numeric field through `DescuentoPorcentaje`, text fields through `Nombre` and `Descripcion`, a status field through `Activa`, a date field through `FechaCreacion`, and validation rules with Data Annotations in `Models/Categoria.cs`.
+The `Categorias` table includes a primary key through `Id`, a decimal numeric field through `DescuentoPorcentaje`, text fields through `Nombre` and `Descripcion`, a status field through `Activa`, a date field through `FechaCreacion`, and validation rules with Data Annotations in `Models/Categoria.cs`. The `Productos` table references `Categorias` through the optional foreign key `CategoriaId`, creating a one-to-many relationship where one category can contain many products.
 
 ## 6. How to Run
 

@@ -19,39 +19,7 @@ namespace CrudProductos.Controllers
         {
             _context = context;
         }
-
-
-        //Mostrar los productos que tengan stock disponible, ordenar los 
-        // resultados desde el precio más alto al más bajo, saltar los 
-        // 2 primeros registros y mostrar únicamente los 5 siguientes productos.
-        /*public async Task<IActionResult> Index()
-        {
-            return View(await _context.Productos
-                .Where(p => p.Stock > 0)              // stock disponible
-                .OrderByDescending(p => p.Precio)     // precio más alto a más bajo
-                .Skip(2)                               // saltar los 2 primeros
-                .Take(5)                               // tomar los siguientes 5
-                .ToListAsync());
-        }
-        */
-        /*public async Task<IActionResult> Index()
-        {
-            return View(await _context.Productos
-                .Where(p => p.Precio >= 300 && p.Precio <= 1000)              // stock disponible
-                .OrderBy(p => p.Stock)     // precio más alto a más bajo
-                                           //.Skip(2)                               // saltar los 2 primeros
-                                           //.Take(5)                               // tomar los siguientes 5
-                .ToListAsync());
-        }*/
-        /*public async Task<IActionResult> Index()
-        {
-            String palabra = "RAM";
-            return View(await _context.Productos
-            .Where(p=> EF.Functions.ILike(p.Descripcion, $"%{palabra}$")) 
-           //     .Where(p => p.Nombre.Contains("a", StringComparison.OrdinalIgnoreCase)) 
-                .OrderBy(p => p.Nombre)     
-                .ToListAsync());
-        }*/
+        
         public async Task<IActionResult> Index(int page = 1)
         {
             const int pageSize = 5;
@@ -59,6 +27,7 @@ namespace CrudProductos.Controllers
 
             var query = _context.Productos
                 .AsNoTracking()
+                .Include(p => p.Categoria)
                 .OrderBy(p => p.Id);
 
             var totalItems = await query.CountAsync();
@@ -93,6 +62,7 @@ namespace CrudProductos.Controllers
             }
 
             var producto = await _context.Productos
+                .Include(p => p.Categoria)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (producto == null)
             {
@@ -105,6 +75,7 @@ namespace CrudProductos.Controllers
         // GET: Productos/Create
         public IActionResult Create()
         {
+            CargarCategorias();
             return View();
         }
 
@@ -126,7 +97,7 @@ namespace CrudProductos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,Precio,Stock")] Producto producto)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,Precio,Stock,CategoriaId")] Producto producto)
         {
             if (ModelState.IsValid)
             {
@@ -135,6 +106,7 @@ namespace CrudProductos.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            CargarCategorias(producto.CategoriaId);
             return View(producto);
         }
 
@@ -151,6 +123,7 @@ namespace CrudProductos.Controllers
             {
                 return NotFound();
             }
+            CargarCategorias(producto.CategoriaId);
             return View(producto);
         }
 
@@ -159,7 +132,7 @@ namespace CrudProductos.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,Precio,Stock,FechaRegistro")] Producto producto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,Precio,Stock,FechaRegistro,CategoriaId")] Producto producto)
         {
             if (id != producto.Id)
             {
@@ -187,6 +160,7 @@ namespace CrudProductos.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            CargarCategorias(producto.CategoriaId);
             return View(producto);
         }
 
@@ -199,6 +173,7 @@ namespace CrudProductos.Controllers
             }
 
             var producto = await _context.Productos
+                .Include(p => p.Categoria)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (producto == null)
             {
@@ -226,6 +201,15 @@ namespace CrudProductos.Controllers
         private bool ProductoExists(int id)
         {
             return _context.Productos.Any(e => e.Id == id);
+        }
+
+        private void CargarCategorias(int? categoriaId = null)
+        {
+            ViewData["CategoriaId"] = new SelectList(
+                _context.Categorias.AsNoTracking().OrderBy(c => c.Nombre),
+                "Id",
+                "Nombre",
+                categoriaId);
         }
     }
 }

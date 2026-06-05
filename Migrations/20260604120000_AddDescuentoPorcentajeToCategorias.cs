@@ -13,7 +13,7 @@ namespace CrudProductos.Migrations
             migrationBuilder.AddColumn<decimal>(
                 name: "DescuentoPorcentaje",
                 table: "Categorias",
-                type: "numeric",
+                type: "numeric(5,2)",
                 nullable: false,
                 defaultValue: 0m);
         }
