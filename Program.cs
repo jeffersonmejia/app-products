@@ -1,14 +1,6 @@
 using CrudProductos.Data;
 using Microsoft.EntityFrameworkCore;
 
-
-/*
-
-AddControllersWithViews	Activa MVC con controladores y vistas.
-AddDbContext<AppDbContext>	Registra el DbContext para inyección de dependencia.
-UseNpgsql	Indica que la base de datos es PostgreSQL.
-MapControllerRoute	Define la ruta inicial hacia Productos/Index.
-*/
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();

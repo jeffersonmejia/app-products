@@ -5,6 +5,18 @@ namespace CrudProductos.Data
 {
     public static class DbInitializer
     {
+        private static readonly Dictionary<string, decimal> DescuentosPorCategoria = new()
+        {
+            ["Computadoras"] = 5.00m,
+            ["Monitores"] = 7.50m,
+            ["Perifericos"] = 10.00m,
+            ["Almacenamiento"] = 8.00m,
+            ["Redes"] = 6.00m,
+            ["Impresion"] = 4.50m,
+            ["Software"] = 12.00m,
+            ["Mobiliario"] = 3.00m
+        };
+
         public static async Task ApplyMigrationsAndSeedAsync(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
@@ -142,23 +154,44 @@ namespace CrudProductos.Data
         {
             if (await context.Categorias.AnyAsync())
             {
+                await ActualizarDescuentosCategoriasAsync(context);
                 return;
             }
 
             var categorias = new List<Categoria>
             {
-                new() { Nombre = "Computadoras", Descripcion = "Equipos portatiles y de escritorio para laboratorio", DescuentoPorcentaje = 5.00m, Activa = true },
-                new() { Nombre = "Monitores", Descripcion = "Pantallas para oficina, aula y productividad", DescuentoPorcentaje = 7.50m, Activa = true },
-                new() { Nombre = "Perifericos", Descripcion = "Teclados, mouse, webcam y accesorios USB", DescuentoPorcentaje = 10.00m, Activa = true },
-                new() { Nombre = "Almacenamiento", Descripcion = "Discos SSD, NVMe, externos y unidades USB", DescuentoPorcentaje = 8.00m, Activa = true },
-                new() { Nombre = "Redes", Descripcion = "Routers, switches y cableado de red", DescuentoPorcentaje = 6.00m, Activa = true },
-                new() { Nombre = "Impresion", Descripcion = "Impresoras laser, tinta y consumibles", DescuentoPorcentaje = 4.50m, Activa = true },
-                new() { Nombre = "Software", Descripcion = "Licencias, suscripciones y seguridad informatica", DescuentoPorcentaje = 12.00m, Activa = true },
-                new() { Nombre = "Mobiliario", Descripcion = "Sillas, escritorios y elementos para aula", DescuentoPorcentaje = 3.00m, Activa = false }
+                new() { Nombre = "Computadoras", Descripcion = "Equipos portatiles y de escritorio para laboratorio", DescuentoPorcentaje = DescuentosPorCategoria["Computadoras"], Activa = true },
+                new() { Nombre = "Monitores", Descripcion = "Pantallas para oficina, aula y productividad", DescuentoPorcentaje = DescuentosPorCategoria["Monitores"], Activa = true },
+                new() { Nombre = "Perifericos", Descripcion = "Teclados, mouse, webcam y accesorios USB", DescuentoPorcentaje = DescuentosPorCategoria["Perifericos"], Activa = true },
+                new() { Nombre = "Almacenamiento", Descripcion = "Discos SSD, NVMe, externos y unidades USB", DescuentoPorcentaje = DescuentosPorCategoria["Almacenamiento"], Activa = true },
+                new() { Nombre = "Redes", Descripcion = "Routers, switches y cableado de red", DescuentoPorcentaje = DescuentosPorCategoria["Redes"], Activa = true },
+                new() { Nombre = "Impresion", Descripcion = "Impresoras laser, tinta y consumibles", DescuentoPorcentaje = DescuentosPorCategoria["Impresion"], Activa = true },
+                new() { Nombre = "Software", Descripcion = "Licencias, suscripciones y seguridad informatica", DescuentoPorcentaje = DescuentosPorCategoria["Software"], Activa = true },
+                new() { Nombre = "Mobiliario", Descripcion = "Sillas, escritorios y elementos para aula", DescuentoPorcentaje = DescuentosPorCategoria["Mobiliario"], Activa = false }
             };
 
             context.Categorias.AddRange(categorias);
             await context.SaveChangesAsync();
+        }
+
+        private static async Task ActualizarDescuentosCategoriasAsync(AppDbContext context)
+        {
+            var categorias = await context.Categorias
+                .Where(c => c.DescuentoPorcentaje == 0)
+                .ToListAsync();
+
+            foreach (var categoria in categorias)
+            {
+                if (DescuentosPorCategoria.TryGetValue(categoria.Nombre, out var descuento))
+                {
+                    categoria.DescuentoPorcentaje = descuento;
+                }
+            }
+
+            if (context.ChangeTracker.HasChanges())
+            {
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
