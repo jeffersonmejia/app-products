@@ -8,6 +8,7 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Id</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Nombre</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Descripcion</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Descuento</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Activa</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Fecha de creacion</th>
                 </tr>
@@ -19,6 +20,7 @@
                         <td class="px-4 py-3 text-sm text-slate-500">@categoria.Id</td>
                         <td class="px-4 py-3 text-sm font-medium text-slate-900">@categoria.Nombre</td>
                         <td class="px-4 py-3 text-sm text-slate-600">@categoria.Descripcion</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">@categoria.DescuentoPorcentaje.ToString("0.##")%</td>
                         <td class="px-4 py-3 text-sm">
                             <span class="inline-flex rounded-md px-2 py-1 text-xs font-medium @(categoria.Activa ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-600 ring-1 ring-slate-200")">
                                 @(categoria.Activa ? "Si" : "No")

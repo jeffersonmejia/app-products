@@ -14,6 +14,9 @@ namespace CrudProductos.Models
         [StringLength(200)]
         public string Descripcion { get; set; } = string.Empty;
 
+        [Range(0, 100, ErrorMessage = "El descuento debe estar entre 0 y 100")]
+        public decimal DescuentoPorcentaje { get; set; }
+
         public bool Activa { get; set; } = true;
 
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;

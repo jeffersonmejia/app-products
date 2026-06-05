@@ -38,6 +38,9 @@ namespace CrudProductos.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<decimal>("DescuentoPorcentaje")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 

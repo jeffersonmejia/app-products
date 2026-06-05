@@ -42,6 +42,7 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 6. Category names and descriptions are required.
 7. Category names are limited to 80 characters.
 8. Category descriptions are limited to 200 characters.
+9. Category discount percentages must be between `0` and `100`.
 
 ## 5. Configuration Risks
 

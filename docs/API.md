@@ -98,6 +98,7 @@ This project exposes server-rendered MVC routes instead of a JSON REST API. Each
    - `Id`: integer primary identifier.
    - `Nombre`: required string, maximum length 80.
    - `Descripcion`: required string, maximum length 200.
+   - `DescuentoPorcentaje`: decimal discount percentage from `0` to `100`.
    - `Activa`: boolean status.
    - `FechaCreacion`: UTC creation date.
 

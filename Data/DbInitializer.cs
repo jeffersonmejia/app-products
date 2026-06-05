@@ -87,14 +87,14 @@ namespace CrudProductos.Data
 
             var categorias = new List<Categoria>
             {
-                new() { Nombre = "Computadoras", Descripcion = "Equipos portatiles y de escritorio para laboratorio", Activa = true },
-                new() { Nombre = "Monitores", Descripcion = "Pantallas para oficina, aula y productividad", Activa = true },
-                new() { Nombre = "Perifericos", Descripcion = "Teclados, mouse, webcam y accesorios USB", Activa = true },
-                new() { Nombre = "Almacenamiento", Descripcion = "Discos SSD, NVMe, externos y unidades USB", Activa = true },
-                new() { Nombre = "Redes", Descripcion = "Routers, switches y cableado de red", Activa = true },
-                new() { Nombre = "Impresion", Descripcion = "Impresoras laser, tinta y consumibles", Activa = true },
-                new() { Nombre = "Software", Descripcion = "Licencias, suscripciones y seguridad informatica", Activa = true },
-                new() { Nombre = "Mobiliario", Descripcion = "Sillas, escritorios y elementos para aula", Activa = false }
+                new() { Nombre = "Computadoras", Descripcion = "Equipos portatiles y de escritorio para laboratorio", DescuentoPorcentaje = 5.00m, Activa = true },
+                new() { Nombre = "Monitores", Descripcion = "Pantallas para oficina, aula y productividad", DescuentoPorcentaje = 7.50m, Activa = true },
+                new() { Nombre = "Perifericos", Descripcion = "Teclados, mouse, webcam y accesorios USB", DescuentoPorcentaje = 10.00m, Activa = true },
+                new() { Nombre = "Almacenamiento", Descripcion = "Discos SSD, NVMe, externos y unidades USB", DescuentoPorcentaje = 8.00m, Activa = true },
+                new() { Nombre = "Redes", Descripcion = "Routers, switches y cableado de red", DescuentoPorcentaje = 6.00m, Activa = true },
+                new() { Nombre = "Impresion", Descripcion = "Impresoras laser, tinta y consumibles", DescuentoPorcentaje = 4.50m, Activa = true },
+                new() { Nombre = "Software", Descripcion = "Licencias, suscripciones y seguridad informatica", DescuentoPorcentaje = 12.00m, Activa = true },
+                new() { Nombre = "Mobiliario", Descripcion = "Sillas, escritorios y elementos para aula", DescuentoPorcentaje = 3.00m, Activa = false }
             };
 
             context.Categorias.AddRange(categorias);

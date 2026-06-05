@@ -6,8 +6,9 @@
 2. [Project Documentation](#2-project-documentation)
 3. [Main Features](#3-main-features)
 4. [Technologies](#4-technologies)
-5. [How to Run](#5-how-to-run)
-6. [Expected Result](#6-expected-result)
+5. [Database Schema](#5-database-schema)
+6. [How to Run](#6-how-to-run)
+7. [Expected Result](#7-expected-result)
 
 ## 1. Summary
 
@@ -40,7 +41,34 @@ The application includes a product CRUD module with pagination and a category mo
 4. PostgreSQL.
 5. Docker Compose.
 
-## 5. How to Run
+## 5. Database Schema
+
+The database contains two main tables: `Productos` for product CRUD operations and `Categorias` for LINQ query examples.
+
+```mermaid
+erDiagram
+    PRODUCTOS {
+        int Id PK
+        string Nombre
+        string Descripcion
+        decimal Precio
+        int Stock
+        datetime FechaRegistro
+    }
+
+    CATEGORIAS {
+        int Id PK
+        string Nombre
+        string Descripcion
+        decimal DescuentoPorcentaje
+        bool Activa
+        datetime FechaCreacion
+    }
+```
+
+The `Categorias` table includes a primary key through `Id`, a decimal numeric field through `DescuentoPorcentaje`, text fields through `Nombre` and `Descripcion`, a status field through `Activa`, a date field through `FechaCreacion`, and validation rules with Data Annotations in `Models/Categoria.cs`.
+
+## 6. How to Run
 
 1. Start PostgreSQL:
 
@@ -66,7 +94,7 @@ http://localhost:5198/Productos
 http://localhost:5198/Categorias
 ```
 
-## 6. Expected Result
+## 7. Expected Result
 
 1. The database is created or updated through Entity Framework Core migrations.
 2. Initial product and category records are inserted when missing.

@@ -48,7 +48,7 @@ The default route opens the product module, while the category module demonstrat
 ## 5. Database Design
 
 1. `Productos` stores product records with `Id`, `Nombre`, `Descripcion`, `Precio`, `Stock`, and `FechaRegistro`.
-2. `Categorias` stores category records with `Id`, `Nombre`, `Descripcion`, `Activa`, and `FechaCreacion`.
+2. `Categorias` stores category records with `Id`, `Nombre`, `Descripcion`, `DescuentoPorcentaje`, `Activa`, and `FechaCreacion`.
 3. Entity Framework Core migrations keep the PostgreSQL schema synchronized with the C# model definitions.
 4. The category entity uses Code First configuration for required text fields and maximum lengths.
 
