@@ -1,5 +1,7 @@
 using CrudProductos.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text;
 
 namespace CrudProductos.Data
 {
@@ -94,18 +96,18 @@ namespace CrudProductos.Data
                 .Where(p => !nombresExistentes.Contains(p.Nombre))
                 .ToList();
 
-            if (productosFaltantes.Count == 0)
+            if (productosFaltantes.Count > 0)
             {
-                return;
+                context.Productos.AddRange(productosFaltantes);
+                await context.SaveChangesAsync();
             }
 
-            context.Productos.AddRange(productosFaltantes);
-            await context.SaveChangesAsync();
+            await ActualizarCategoriasProductosAsync(context);
         }
 
         private static string ObtenerCategoriaNombre(string nombre, string descripcion)
         {
-            var texto = $"{nombre} {descripcion}".ToLowerInvariant();
+            var texto = NormalizarTexto($"{nombre} {descripcion}");
 
             if (texto.Contains("laptop") || texto.Contains("macbook") || texto.Contains("tablet"))
             {
@@ -150,6 +152,22 @@ namespace CrudProductos.Data
             return "Mobiliario";
         }
 
+        private static string NormalizarTexto(string texto)
+        {
+            var normalized = texto.ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var builder = new StringBuilder();
+
+            foreach (var character in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
+                {
+                    builder.Append(character);
+                }
+            }
+
+            return builder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
         private static async Task SeedCategoriasAsync(AppDbContext context)
         {
             if (await context.Categorias.AnyAsync())
@@ -185,6 +203,31 @@ namespace CrudProductos.Data
                 if (DescuentosPorCategoria.TryGetValue(categoria.Nombre, out var descuento))
                 {
                     categoria.DescuentoPorcentaje = descuento;
+                }
+            }
+
+            if (context.ChangeTracker.HasChanges())
+            {
+                await context.SaveChangesAsync();
+            }
+        }
+
+        private static async Task ActualizarCategoriasProductosAsync(AppDbContext context)
+        {
+            var categoriasPorNombre = await context.Categorias
+                .ToDictionaryAsync(c => c.Nombre, c => c.Id);
+
+            var productosSinCategoria = await context.Productos
+                .Where(p => p.CategoriaId == null)
+                .ToListAsync();
+
+            foreach (var producto in productosSinCategoria)
+            {
+                var categoriaNombre = ObtenerCategoriaNombre(producto.Nombre, producto.Descripcion);
+
+                if (categoriasPorNombre.TryGetValue(categoriaNombre, out var categoriaId))
+                {
+                    producto.CategoriaId = categoriaId;
                 }
             }
 
