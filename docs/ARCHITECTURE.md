@@ -78,9 +78,9 @@ classDiagram
         +string Descripcion
         +decimal Precio
         +int Stock
-        +int? CategoriaId
+        +int CategoriaId
         +DateTime FechaRegistro
-        +Categoria? Categoria
+        +Categoria Categoria
     }
 
     class Categoria {
@@ -90,11 +90,11 @@ classDiagram
         +decimal DescuentoPorcentaje
         +bool Activa
         +DateTime FechaCreacion
-        +ICollection~Producto~ Productos
+        +Productos
     }
 
-    class PagedResult~T~ {
-        +IReadOnlyList~T~ Items
+    class PagedResult {
+        +Items
         +int Page
         +int PageSize
         +int TotalItems
@@ -104,15 +104,15 @@ classDiagram
     }
 
     class ConsultasCategoriasViewModel {
-        +string? Busqueda
-        +List~Categoria~ Todas
-        +List~Categoria~ Activas
-        +List~Categoria~ Filtradas
-        +List~Categoria~ Recientes
+        +string Busqueda
+        +Categorias Todas
+        +Categorias Activas
+        +Categorias Filtradas
+        +Categorias Recientes
     }
 
     Categoria "1" --> "0..*" Producto : contains
-    PagedResult~Producto~ --> Producto : paginates
+    PagedResult --> Producto : paginates
     ConsultasCategoriasViewModel --> Categoria : groups
 ```
 
@@ -121,15 +121,15 @@ classDiagram
 ```mermaid
 classDiagram
     class AppDbContext {
-        +DbSet~Producto~ Productos
-        +DbSet~Categoria~ Categorias
-        #OnModelCreating(ModelBuilder modelBuilder)
+        +DbSet Productos
+        +DbSet Categorias
+        #OnModelCreating()
     }
 
     class DbInitializer {
-        +ApplyMigrationsAndSeedAsync(WebApplication app)
-        -SeedProductosAsync(AppDbContext context)
-        -SeedCategoriasAsync(AppDbContext context)
+        +ApplyMigrationsAndSeedAsync()
+        -SeedProductosAsync()
+        -SeedCategoriasAsync()
     }
 
     class Producto
@@ -147,18 +147,18 @@ classDiagram
     class ProductosController {
         -AppDbContext _context
         +Index(int page)
-        +Details(int? id)
+        +Details(int id)
         +Create()
         +Create(Producto producto)
-        +Edit(int? id)
+        +Edit(int id)
         +Edit(int id, Producto producto)
-        +Delete(int? id)
+        +Delete(int id)
         +DeleteConfirmed(int id)
     }
 
     class CategoriasController {
         -AppDbContext _context
-        +Index(string? busqueda)
+        +Index(string busqueda)
     }
 
     class AppDbContext
