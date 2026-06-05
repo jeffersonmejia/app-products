@@ -22,6 +22,18 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers.TryAdd("X-Content-Type-Options", "nosniff");
+    headers.TryAdd("X-Frame-Options", "DENY");
+    headers.TryAdd("Referrer-Policy", "strict-origin-when-cross-origin");
+    headers.TryAdd("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+    await next();
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

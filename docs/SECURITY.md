@@ -22,6 +22,12 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 5. HSTS is enabled outside the development environment.
 6. HTTPS redirection is enabled outside the development environment.
 7. Static file serving is limited to configured application static files.
+8. Product create and edit actions reject another product with exactly the same `Nombre`.
+9. Category create and edit actions reject another category with exactly the same `Nombre`.
+10. Product create and edit actions verify that a submitted `CategoriaId` exists before saving.
+11. Product and category text fields are trimmed before saving to reduce accidental duplicate records.
+12. The category query search term is trimmed and length-limited before it is used in the LINQ query.
+13. Basic HTTP response headers are configured in `Program.cs`: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`.
 
 ## 3. Database Security
 
@@ -43,6 +49,9 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 7. Category names are limited to 80 characters.
 8. Category descriptions are limited to 200 characters.
 9. Category discount percentages must be between `0` and `100`.
+10. Product names must not duplicate an existing product name exactly.
+11. Category names must not duplicate an existing category name exactly.
+12. Product category selections must reference an existing category record.
 
 ## 5. Configuration Risks
 
@@ -51,6 +60,8 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 3. Product and category create, update, and delete actions are publicly reachable in the current MVC setup.
 4. `AllowedHosts` is set to `*`, which is acceptable for local development but should be restricted for production.
 5. Automatic migrations on startup are convenient for development, but production deployments should review migration execution policies.
+6. Duplicate validation is currently implemented in controller logic; a database unique index would be stronger against simultaneous requests.
+7. A full Content Security Policy is not enabled yet because the current layout uses Tailwind from a CDN with inline configuration.
 
 ## 6. Recommended Improvements
 
@@ -62,3 +73,6 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 6. Review migration execution before production release.
 7. Add logging for failed write operations and unexpected database errors.
 8. Keep Docker secrets outside version control.
+9. Add database-level unique indexes for product and category names.
+10. Add rate limiting for write endpoints.
+11. Add a Content Security Policy after moving Tailwind assets/configuration to a CSP-compatible setup.

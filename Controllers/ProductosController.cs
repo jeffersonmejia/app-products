@@ -28,7 +28,8 @@ namespace CrudProductos.Controllers
             var query = _context.Productos
                 .AsNoTracking()
                 .Include(p => p.Categoria)
-                .OrderBy(p => p.Id);
+                .OrderByDescending(p => p.FechaRegistro)
+                .ThenByDescending(p => p.Id);
 
             var totalItems = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -99,6 +100,10 @@ namespace CrudProductos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,Precio,Stock,CategoriaId")] Producto producto)
         {
+            producto.Nombre = producto.Nombre.Trim();
+            producto.Descripcion = producto.Descripcion.Trim();
+            await ValidarProductoAsync(producto);
+
             if (ModelState.IsValid)
             {
                 producto.FechaRegistro = DateTime.UtcNow;
@@ -138,6 +143,10 @@ namespace CrudProductos.Controllers
             {
                 return NotFound();
             }
+
+            producto.Nombre = producto.Nombre.Trim();
+            producto.Descripcion = producto.Descripcion.Trim();
+            await ValidarProductoAsync(producto);
 
             if (ModelState.IsValid)
             {
@@ -201,6 +210,20 @@ namespace CrudProductos.Controllers
         private bool ProductoExists(int id)
         {
             return _context.Productos.Any(e => e.Id == id);
+        }
+
+        private async Task ValidarProductoAsync(Producto producto)
+        {
+            if (await _context.Productos.AnyAsync(p => p.Id != producto.Id && p.Nombre == producto.Nombre))
+            {
+                ModelState.AddModelError(nameof(Producto.Nombre), "Ya existe un producto con exactamente el mismo nombre.");
+            }
+
+            if (producto.CategoriaId.HasValue
+                && !await _context.Categorias.AnyAsync(c => c.Id == producto.CategoriaId.Value))
+            {
+                ModelState.AddModelError(nameof(Producto.CategoriaId), "La categoria seleccionada no existe.");
+            }
         }
 
         private void CargarCategorias(int? categoriaId = null)

@@ -14,49 +14,98 @@ namespace CrudProductos.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var categorias = await _context.Categorias
+            const int pageSize = 5;
+            page = Math.Max(page, 1);
+
+            var query = _context.Categorias
                 .AsNoTracking()
                 .Include(c => c.Productos)
-                .OrderBy(c => c.Nombre)
+                .OrderByDescending(c => c.FechaCreacion)
+                .ThenByDescending(c => c.Id);
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+            }
+
+            var categorias = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return View(categorias);
+            var pagedResult = new PagedResult<Categoria>
+            {
+                Items = categorias,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+
+            return View(pagedResult);
         }
 
         public async Task<IActionResult> Consultas(string? busqueda)
         {
+            busqueda = busqueda?.Trim();
+            if (busqueda?.Length > 80)
+            {
+                busqueda = busqueda[..80];
+            }
+
             var categorias = _context.Categorias.AsNoTracking();
 
-            var todas = await categorias
+            var resultadoWhere = await categorias
+                .Where(c => c.Activa)
+                .ToListAsync();
+
+            var resultadoOrderBy = await categorias
                 .OrderBy(c => c.Id)
                 .ToListAsync();
 
-            var activas = await categorias
-                .Where(c => c.Activa)
-                .OrderBy(c => c.Nombre)
-                .ToListAsync();
-
-            var filtradas = await categorias
-                .Where(c => string.IsNullOrWhiteSpace(busqueda)
-                    || EF.Functions.ILike(c.Nombre, $"%{busqueda}%")
-                    || EF.Functions.ILike(c.Descripcion, $"%{busqueda}%"))
-                .OrderBy(c => c.Nombre)
-                .ToListAsync();
-
-            var recientes = await categorias
+            var resultadoOrderByDescending = await categorias
                 .OrderByDescending(c => c.FechaCreacion)
+                .ToListAsync();
+
+            var resultadoTake = await categorias
                 .Take(3)
+                .ToListAsync();
+
+            var textoBusqueda = string.IsNullOrWhiteSpace(busqueda) ? "a" : busqueda;
+
+            var resultadoContains = await categorias
+                .Where(c => c.Nombre.Contains(textoBusqueda) || c.Descripcion.Contains(textoBusqueda))
+                .OrderBy(c => c.Nombre)
+                .ToListAsync();
+
+            var resultadoILike = await categorias
+                .Where(c => EF.Functions.ILike(c.Nombre, $"%{textoBusqueda}%")
+                    || EF.Functions.ILike(c.Descripcion, $"%{textoBusqueda}%"))
+                .OrderBy(c => c.Nombre)
+                .ToListAsync();
+
+            var filtroCombinado = await categorias
+                .Where(c => c.Activa
+                    && c.DescuentoPorcentaje > 5
+                    && (EF.Functions.ILike(c.Nombre, $"%{textoBusqueda}%")
+                        || EF.Functions.ILike(c.Descripcion, $"%{textoBusqueda}%")))
+                .OrderByDescending(c => c.DescuentoPorcentaje)
                 .ToListAsync();
 
             var viewModel = new ConsultasCategoriasViewModel
             {
                 Busqueda = busqueda,
-                Todas = todas,
-                Activas = activas,
-                Filtradas = filtradas,
-                Recientes = recientes
+                Where = resultadoWhere,
+                OrderBy = resultadoOrderBy,
+                OrderByDescending = resultadoOrderByDescending,
+                Take = resultadoTake,
+                Contains = resultadoContains,
+                ILike = resultadoILike,
+                FiltroCombinado = filtroCombinado
             };
 
             return View(viewModel);
@@ -91,6 +140,10 @@ namespace CrudProductos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,DescuentoPorcentaje,Activa")] Categoria categoria)
         {
+            categoria.Nombre = categoria.Nombre.Trim();
+            categoria.Descripcion = categoria.Descripcion.Trim();
+            await ValidarCategoriaAsync(categoria);
+
             if (ModelState.IsValid)
             {
                 categoria.FechaCreacion = DateTime.UtcNow;
@@ -121,18 +174,33 @@ namespace CrudProductos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,DescuentoPorcentaje,Activa,FechaCreacion")] Categoria categoria)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,DescuentoPorcentaje,Activa")] Categoria categoria)
         {
             if (id != categoria.Id)
             {
                 return NotFound();
             }
 
+            categoria.Nombre = categoria.Nombre.Trim();
+            categoria.Descripcion = categoria.Descripcion.Trim();
+            await ValidarCategoriaAsync(categoria);
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(categoria);
+                    var categoriaExistente = await _context.Categorias.FindAsync(id);
+
+                    if (categoriaExistente == null)
+                    {
+                        return NotFound();
+                    }
+
+                    categoriaExistente.Nombre = categoria.Nombre;
+                    categoriaExistente.Descripcion = categoria.Descripcion;
+                    categoriaExistente.DescuentoPorcentaje = categoria.DescuentoPorcentaje;
+                    categoriaExistente.Activa = categoria.Activa;
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -189,6 +257,14 @@ namespace CrudProductos.Controllers
         private bool CategoriaExists(int id)
         {
             return _context.Categorias.Any(c => c.Id == id);
+        }
+
+        private async Task ValidarCategoriaAsync(Categoria categoria)
+        {
+            if (await _context.Categorias.AnyAsync(c => c.Id != categoria.Id && c.Nombre == categoria.Nombre))
+            {
+                ModelState.AddModelError(nameof(Categoria.Nombre), "Ya existe una categoria con exactamente el mismo nombre.");
+            }
         }
     }
 }

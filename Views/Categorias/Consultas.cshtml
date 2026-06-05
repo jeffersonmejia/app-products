@@ -19,21 +19,43 @@
 </form>
 
 <section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Todas las categorias</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Todas)
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">Where</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>Where(c => c.Activa)</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.Where)
 </section>
 
 <section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Categorias activas ordenadas por nombre</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Activas)
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">OrderBy</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>OrderBy(c => c.Id)</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.OrderBy)
 </section>
 
 <section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Resultado del filtro</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Filtradas)
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">OrderByDescending</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>OrderByDescending(c => c.FechaCreacion)</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.OrderByDescending)
 </section>
 
 <section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Ultimas 3 categorias creadas</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Recientes)
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">Take</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>Take(3)</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.Take)
+</section>
+
+<section class="mb-8">
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">Contains</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>Where(c => c.Nombre.Contains(textoBusqueda) || c.Descripcion.Contains(textoBusqueda))</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.Contains)
+</section>
+
+<section class="mb-8">
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">ILike o busqueda equivalente en PostgreSQL</h2>
+    <p class="mb-3 text-sm text-slate-500">PostgreSQL aplicado desde EF Core: <code>EF.Functions.ILike(c.Nombre, $"%{textoBusqueda}%")</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.ILike)
+</section>
+
+<section class="mb-8">
+    <h2 class="mb-3 text-lg font-semibold text-slate-900">Filtro combinado usando mas de una condicion</h2>
+    <p class="mb-3 text-sm text-slate-500">LINQ aplicado: <code>Where(c => c.Activa && c.DescuentoPorcentaje > 5 && EF.Functions.ILike(...))</code></p>
+    @await Html.PartialAsync("_TablaCategorias", Model.FiltroCombinado)
 </section>

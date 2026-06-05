@@ -4,12 +4,18 @@ namespace CrudProductos.Models
     {
         public string? Busqueda { get; set; }
 
-        public List<Categoria> Todas { get; set; } = new();
+        public List<Categoria> Where { get; set; } = new();
 
-        public List<Categoria> Activas { get; set; } = new();
+        public List<Categoria> OrderBy { get; set; } = new();
 
-        public List<Categoria> Filtradas { get; set; } = new();
+        public List<Categoria> OrderByDescending { get; set; } = new();
 
-        public List<Categoria> Recientes { get; set; } = new();
+        public List<Categoria> Take { get; set; } = new();
+
+        public List<Categoria> Contains { get; set; } = new();
+
+        public List<Categoria> ILike { get; set; } = new();
+
+        public List<Categoria> FiltroCombinado { get; set; } = new();
     }
 }

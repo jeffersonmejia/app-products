@@ -109,12 +109,7 @@ namespace CrudProductos.Data
         {
             var texto = NormalizarTexto($"{nombre} {descripcion}");
 
-            if (texto.Contains("laptop") || texto.Contains("macbook") || texto.Contains("tablet"))
-            {
-                return "Computadoras";
-            }
-
-            if (texto.Contains("monitor") || texto.Contains("proyector"))
+            if (texto.Contains("monitor") || texto.Contains("proyector") || texto.Contains("hdmi"))
             {
                 return "Monitores";
             }
@@ -125,6 +120,11 @@ namespace CrudProductos.Data
                 || texto.Contains("soporte"))
             {
                 return "Perifericos";
+            }
+
+            if (texto.Contains("laptop") || texto.Contains("macbook") || texto.Contains("tablet"))
+            {
+                return "Computadoras";
             }
 
             if (texto.Contains("ssd") || texto.Contains("nvme") || texto.Contains("pendrive")

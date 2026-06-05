@@ -1,13 +1,24 @@
-@model IEnumerable<CrudProductos.Models.Categoria>
+@model CrudProductos.Models.PagedResult<CrudProductos.Models.Categoria>
 
 @{
     ViewData["Title"] = "Categorias";
+    const int maxVisiblePages = 5;
+    var totalPages = Model.TotalPages;
+    var startPage = Math.Max(1, Model.Page - maxVisiblePages / 2);
+    var endPage = Math.Min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages)
+    {
+        startPage = Math.Max(1, endPage - maxVisiblePages + 1);
+    }
 }
 
 <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
         <h1 class="mb-1 text-2xl font-semibold text-slate-950">Categorias</h1>
-        <p class="m-0 text-sm text-slate-500">Administracion CRUD de categorias relacionadas con productos.</p>
+        <p class="m-0 text-sm text-slate-500">
+            Mostrando @Model.Items.Count de @Model.TotalItems categorias. Pagina @Model.Page de @Model.TotalPages.
+        </p>
     </div>
 
     <div class="flex flex-wrap gap-2">
@@ -31,7 +42,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
-                @foreach (var categoria in Model)
+                @foreach (var categoria in Model.Items)
                 {
                     <tr class="hover:bg-slate-50">
                         <td class="px-4 py-3 text-sm font-medium text-slate-900">@categoria.Nombre</td>
@@ -57,3 +68,14 @@
         </table>
     </div>
 </div>
+
+<nav class="mt-6 flex flex-wrap items-center gap-2" aria-label="Paginacion de categorias">
+    <a class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium no-underline @(Model.HasPreviousPage ? "bg-white text-slate-700 hover:bg-slate-100" : "pointer-events-none bg-slate-100 text-slate-400")" asp-action="Index" asp-route-page="@(Model.Page - 1)">Anterior</a>
+
+    @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+    {
+        <a class="rounded-md border px-3 py-2 text-sm font-medium no-underline @(pageNumber == Model.Page ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100")" asp-action="Index" asp-route-page="@pageNumber">@pageNumber</a>
+    }
+
+    <a class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium no-underline @(Model.HasNextPage ? "bg-white text-slate-700 hover:bg-slate-100" : "pointer-events-none bg-slate-100 text-slate-400")" asp-action="Index" asp-route-page="@(Model.Page + 1)">Siguiente</a>
+</nav>
