@@ -1,140 +1,74 @@
-# Actividad Code First, PostgreSQL y consultas LINQ
+# Code First, PostgreSQL, and LINQ Queries
 
-## Objetivo
+## Table of Contents
 
-Analizar los servicios, dependencias y componentes principales de una aplicacion ASP.NET Core MVC con Entity Framework Core, aplicando el enfoque Code First para crear una nueva entidad y utilizando consultas LINQ basicas para recuperar, filtrar, ordenar y limitar datos desde PostgreSQL.
+1. [Summary](#1-summary)
+2. [Project Documentation](#2-project-documentation)
+3. [Main Features](#3-main-features)
+4. [Technologies](#4-technologies)
+5. [How to Run](#5-how-to-run)
+6. [Expected Result](#6-expected-result)
 
-## Componentes principales del proyecto
+## 1. Summary
 
-- `Program.cs`: configura los servicios de ASP.NET Core MVC, registra `AppDbContext` con PostgreSQL y aplica migraciones al iniciar.
-- `Data/AppDbContext.cs`: representa la conexion de EF Core con la base de datos. Contiene los `DbSet` de `Productos` y `Categorias`.
-- `Models/Producto.cs`: entidad inicial del taller.
-- `Models/Categoria.cs`: nueva entidad creada para esta actividad con enfoque Code First.
-- `Data/DbInitializer.cs`: aplica migraciones pendientes y carga datos iniciales de productos y categorias si las tablas estan vacias.
-- `Controllers/CategoriasController.cs`: ejecuta consultas LINQ basicas sobre PostgreSQL.
-- `Views/Categorias/Index.cshtml`: muestra los resultados de las consultas LINQ.
-- `docker-compose.yml`: levanta PostgreSQL local con healthcheck, volumen persistente y secret para la clave.
+This project is an ASP.NET Core MVC application for managing products and reviewing category data with Entity Framework Core, PostgreSQL, and LINQ queries. It uses the Code First approach to define the database model, apply migrations, and seed initial data when the application starts.
 
-## Dependencias utilizadas
+The application includes a product CRUD module with pagination and a category module that demonstrates common LINQ operations such as retrieving, filtering, ordering, text searching, and limiting results.
 
-El proyecto usa:
+## 2. Project Documentation
 
-- ASP.NET Core MVC.
-- Entity Framework Core.
-- `Npgsql.EntityFrameworkCore.PostgreSQL` como proveedor de PostgreSQL.
-- Docker Compose para levantar la base de datos local.
+1. [Architecture documentation](docs/ARCHITECTURE.md)
+2. [API documentation](docs/API.md)
+3. [Application security documentation](docs/SECURITY.md)
+4. [Repository security policy](SECURITY.md)
 
-## Nueva tabla creada con Code First
+## 3. Main Features
 
-La nueva entidad es `Categoria`:
+1. Product listing with pagination.
+2. Product create, read, update, and delete operations.
+3. Category listing with LINQ examples.
+4. PostgreSQL database integration through Entity Framework Core.
+5. Automatic migration execution on startup.
+6. Initial data seeding for products and categories.
+7. Docker Compose configuration for a local PostgreSQL database.
 
-```csharp
-public class Categoria
-{
-    public int Id { get; set; }
-    public string Nombre { get; set; } = string.Empty;
-    public string Descripcion { get; set; } = string.Empty;
-    public bool Activa { get; set; } = true;
-    public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
-}
-```
+## 4. Technologies
 
-La entidad se registra en `AppDbContext`:
+1. ASP.NET Core MVC.
+2. Entity Framework Core.
+3. Npgsql Entity Framework Core provider for PostgreSQL.
+4. PostgreSQL.
+5. Docker Compose.
 
-```csharp
-public DbSet<Categoria> Categorias { get; set; }
-```
+## 5. How to Run
 
-La migracion que crea la tabla esta en:
-
-```text
-Migrations/20260603235000_AddCategorias.cs
-```
-
-## Carga de datos
-
-La clase `DbInitializer` inserta productos y categorias iniciales cuando las tablas estan vacias:
-
-```csharp
-if (await context.Productos.AnyAsync())
-{
-    return;
-}
-```
-
-Esto evita duplicar datos cada vez que se inicia la aplicacion.
-
-## Consultas LINQ implementadas
-
-Las consultas estan en `Controllers/CategoriasController.cs`.
-
-Recuperar datos:
-
-```csharp
-await categorias.OrderBy(c => c.Id).ToListAsync();
-```
-
-Filtrar datos:
-
-```csharp
-await categorias.Where(c => c.Activa).ToListAsync();
-```
-
-Filtrar texto con PostgreSQL:
-
-```csharp
-await categorias
-    .Where(c => EF.Functions.ILike(c.Nombre, $"%{busqueda}%")
-        || EF.Functions.ILike(c.Descripcion, $"%{busqueda}%"))
-    .ToListAsync();
-```
-
-Ordenar datos:
-
-```csharp
-await categorias.OrderBy(c => c.Nombre).ToListAsync();
-```
-
-Limitar resultados:
-
-```csharp
-await categorias
-    .OrderByDescending(c => c.FechaCreacion)
-    .Take(3)
-    .ToListAsync();
-```
-
-## Pasos para replicar
-
-1. Levantar PostgreSQL:
+1. Start PostgreSQL:
 
 ```bash
 docker compose up -d postgres
 ```
 
-2. Ejecutar la aplicacion:
+2. Run the application:
 
 ```bash
 dotnet run
 ```
 
-Al iniciar, la aplicacion aplica las migraciones pendientes y carga los productos y categorias iniciales.
+3. Open the product module:
 
-3. Abrir el apartado de la nueva tabla:
+```text
+http://localhost:5198/Productos
+```
+
+4. Open the category LINQ module:
 
 ```text
 http://localhost:5198/Categorias
 ```
 
-Tambien se puede entrar desde el menu superior en `Nueva tabla: Categorias`.
+## 6. Expected Result
 
-## Verificacion esperada
-
-En la ruta `/Categorias` se observan cuatro bloques:
-
-- Todas las categorias recuperadas desde PostgreSQL.
-- Categorias activas filtradas con `Where`.
-- Categorias filtradas por texto usando `ILike`.
-- Ultimas 3 categorias usando `OrderByDescending` y `Take`.
-
-La tabla `Categorias` se crea desde el modelo C# mediante la migracion, manteniendo el enfoque Code First.
+1. The database is created or updated through Entity Framework Core migrations.
+2. Initial product and category records are inserted when missing.
+3. The product module displays paginated product data.
+4. The category module displays all categories, active categories, filtered categories, and the three most recent categories.
