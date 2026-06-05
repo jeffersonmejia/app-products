@@ -1,38 +1,59 @@
-@model CrudProductos.Models.ConsultasCategoriasViewModel
+@model IEnumerable<CrudProductos.Models.Categoria>
 
 @{
     ViewData["Title"] = "Categorias";
 }
 
-<div class="mb-6">
-    <h1 class="mb-1 text-2xl font-semibold text-slate-950">Nueva tabla: Categorias</h1>
-    <p class="m-0 text-sm text-slate-500">Tabla creada con Code First para cargar datos y ejecutar consultas LINQ desde PostgreSQL.</p>
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <h1 class="mb-1 text-2xl font-semibold text-slate-950">Categorias</h1>
+        <p class="m-0 text-sm text-slate-500">Administracion CRUD de categorias relacionadas con productos.</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+        <a class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100" asp-action="Consultas">Consultas LINQ</a>
+        <a class="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white no-underline shadow-sm hover:bg-slate-700" asp-action="Create">Crear categoria</a>
+    </div>
 </div>
 
-<form asp-action="Index" method="get" class="mb-8 flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:flex-row">
-    <input class="min-h-10 flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200" type="search" name="busqueda" value="@Model.Busqueda" placeholder="Buscar por nombre o descripcion" />
-    <div class="flex gap-2">
-        <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-700" type="submit">Filtrar</button>
-        <a class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100" asp-action="Index">Limpiar</a>
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-100">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Nombre</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Descripcion</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Descuento</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Activa</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Productos</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Fecha de creacion</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                @foreach (var categoria in Model)
+                {
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-sm font-medium text-slate-900">@categoria.Nombre</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@categoria.Descripcion</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">@categoria.DescuentoPorcentaje.ToString("0.##")%</td>
+                        <td class="px-4 py-3 text-sm">
+                            <span class="inline-flex rounded-md px-2 py-1 text-xs font-medium @(categoria.Activa ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-600 ring-1 ring-slate-200")">
+                                @(categoria.Activa ? "Si" : "No")
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-slate-500">@categoria.Productos.Count</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">@categoria.FechaCreacion.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right text-sm">
+                            <a class="font-medium text-slate-700 no-underline hover:text-slate-950" asp-action="Edit" asp-route-id="@categoria.Id">Editar</a>
+                            <span class="mx-1 text-slate-300">|</span>
+                            <a class="font-medium text-slate-700 no-underline hover:text-slate-950" asp-action="Details" asp-route-id="@categoria.Id">Detalle</a>
+                            <span class="mx-1 text-slate-300">|</span>
+                            <a class="font-medium text-red-600 no-underline hover:text-red-800" asp-action="Delete" asp-route-id="@categoria.Id">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</form>
-
-<section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Todas las categorias</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Todas)
-</section>
-
-<section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Categorias activas ordenadas por nombre</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Activas)
-</section>
-
-<section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Resultado del filtro</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Filtradas)
-</section>
-
-<section class="mb-8">
-    <h2 class="mb-3 text-lg font-semibold text-slate-900">Ultimas 3 categorias creadas</h2>
-    @await Html.PartialAsync("_TablaCategorias", Model.Recientes)
-</section>
+</div>

@@ -75,10 +75,51 @@ This project exposes server-rendered MVC routes instead of a JSON REST API. Each
 ## 4. Category Endpoints
 
 1. `GET /Categorias`
+   - Displays the category CRUD list.
+   - Includes category discount, status, creation date, and number of related products.
+
+2. `GET /Categorias/Details/{id}`
+   - Displays one category by identifier.
+   - Includes the number of related products.
+   - Returns `NotFound()` when the id is missing or the category does not exist.
+
+3. `GET /Categorias/Create`
+   - Displays the category creation form.
+
+4. `POST /Categorias/Create`
+   - Creates a category.
+   - Uses anti-forgery validation.
+   - Binds `Id`, `Nombre`, `Descripcion`, `DescuentoPorcentaje`, and `Activa`.
+   - Sets `FechaCreacion` with the current UTC time before saving.
+   - Redirects to the category index after success.
+
+5. `GET /Categorias/Edit/{id}`
+   - Displays the edit form for an existing category.
+   - Returns `NotFound()` when the id is missing or the category does not exist.
+
+6. `POST /Categorias/Edit/{id}`
+   - Updates an existing category.
+   - Uses anti-forgery validation.
+   - Verifies that the route id matches the submitted category id.
+   - Handles EF Core concurrency errors and returns `NotFound()` when the category no longer exists.
+   - Redirects to the category index after success.
+
+7. `GET /Categorias/Delete/{id}`
+   - Displays a delete confirmation page.
+   - Shows how many products are associated with the category.
+   - Returns `NotFound()` when the id is missing or the category does not exist.
+
+8. `POST /Categorias/Delete/{id}`
+   - Deletes the selected category.
+   - Uses anti-forgery validation.
+   - Associated products remain in the database and their `CategoriaId` is set to empty.
+   - Redirects to the category index after success.
+
+9. `GET /Categorias/Consultas`
    - Displays LINQ query results for categories.
    - Optional query parameter: `busqueda`.
 
-2. Category data shown by the page:
+10. Category data shown by the LINQ page:
    - All categories ordered by id.
    - Active categories ordered by name.
    - Categories filtered by `busqueda` using PostgreSQL case-insensitive matching.

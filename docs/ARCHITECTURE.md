@@ -31,7 +31,7 @@ The default route opens the product module, while the category module demonstrat
 2. `Data/AppDbContext.cs`: defines the EF Core context with `Productos` and `Categorias`.
 3. `Data/DbInitializer.cs`: applies migrations and inserts initial product and category data.
 4. `Controllers/ProductosController.cs`: handles product listing, details, creation, editing, and deletion.
-5. `Controllers/CategoriasController.cs`: runs LINQ queries for retrieving, filtering, ordering, and limiting category records.
+5. `Controllers/CategoriasController.cs`: handles category CRUD actions and LINQ queries for retrieving, filtering, ordering, and limiting category records.
 6. `Models/Producto.cs`: represents products with validation for name, description, price, stock, and registration date.
 7. `Models/Categoria.cs`: represents categories with validation for name and description, plus active status and creation date.
 8. `Models/PagedResult.cs`: supports paginated product results.
@@ -158,7 +158,15 @@ classDiagram
 
     class CategoriasController {
         -AppDbContext _context
-        +Index(string busqueda)
+        +Index()
+        +Details(int id)
+        +Create()
+        +Create(Categoria categoria)
+        +Edit(int id)
+        +Edit(int id, Categoria categoria)
+        +Delete(int id)
+        +DeleteConfirmed(int id)
+        +Consultas(string busqueda)
     }
 
     class AppDbContext
@@ -169,7 +177,7 @@ classDiagram
     ProductosController --> AppDbContext : uses
     ProductosController --> Producto : manages
     CategoriasController --> AppDbContext : uses
-    CategoriasController --> Categoria : queries
+    CategoriasController --> Categoria : manages
     CategoriasController --> ConsultasCategoriasViewModel : builds
 ```
 

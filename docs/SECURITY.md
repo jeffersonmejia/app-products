@@ -48,7 +48,7 @@ This document describes security controls and risks for the ASP.NET Core MVC app
 
 1. `appsettings.json` currently contains a database password in the connection string.
 2. The application does not include authentication or authorization rules for product changes.
-3. The category module is read-only, but product create, update, and delete actions are publicly reachable in the current MVC setup.
+3. Product and category create, update, and delete actions are publicly reachable in the current MVC setup.
 4. `AllowedHosts` is set to `*`, which is acceptable for local development but should be restricted for production.
 5. Automatic migrations on startup are convenient for development, but production deployments should review migration execution policies.
 

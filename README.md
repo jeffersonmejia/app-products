@@ -27,11 +27,12 @@ The application includes a product CRUD module with pagination and a category mo
 
 1. Product listing with pagination.
 2. Product create, read, update, and delete operations.
-3. Category listing with LINQ examples.
-4. PostgreSQL database integration through Entity Framework Core.
-5. Automatic migration execution on startup.
-6. Initial data seeding for products and categories.
-7. Docker Compose configuration for a local PostgreSQL database.
+3. Category create, read, update, and delete operations.
+4. Category listing with LINQ examples.
+5. PostgreSQL database integration through Entity Framework Core.
+6. Automatic migration execution on startup.
+7. Initial data seeding for products and categories.
+8. Docker Compose configuration for a local PostgreSQL database.
 
 ## 4. Technologies
 
@@ -94,7 +95,7 @@ http://localhost:5198/Productos
 4. Open the category LINQ module:
 
 ```text
-http://localhost:5198/Categorias
+http://localhost:5198/Categorias/Consultas
 ```
 
 ## 7. Expected Result
@@ -102,4 +103,5 @@ http://localhost:5198/Categorias
 1. The database is created or updated through Entity Framework Core migrations.
 2. Initial product and category records are inserted when missing.
 3. The product module displays paginated product data.
-4. The category module displays all categories, active categories, filtered categories, and the three most recent categories.
+4. The category CRUD module allows category creation, editing, details, and deletion.
+5. The category LINQ module displays all categories, active categories, filtered categories, and the three most recent categories.
